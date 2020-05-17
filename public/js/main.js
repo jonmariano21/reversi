@@ -102,6 +102,8 @@ socket.on('join_room_response', function(payload) {
 //COPIED FROM ABOVE
 /* What to do when the server says that someone has left a room*/
 socket.on('player_disconnected', function(payload) {
+    console.log('Trying to disconnect: '+payload.username);
+
     if(payload.result == 'fail') {
         alert(payload.message);
         return;
@@ -121,7 +123,7 @@ socket.on('player_disconnected', function(payload) {
     }
     
     /* Manage the message that a player has left */
-    var newHTML = '<p>' +payload.username+' has left the lobby</p>';
+    var newHTML = '<p>'+payload.username+' has left the lobby</p>';
     var newNode = $(newHTML);
     newNode.hide();
     $('#messages').append(newNode);
