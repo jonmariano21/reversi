@@ -98,7 +98,7 @@ socket.on('join_room_response', function(payload) {
     /* $('#messages').append('<p> New user joined the room: ' +payload.username+ '</p>'); */
 });
 
-
+/****************************************************************************/
 //COPIED FROM ABOVE
 /* What to do when the server says that someone has left a room*/
 socket.on('player_disconnected', function(payload) {
@@ -132,7 +132,8 @@ socket.on('player_disconnected', function(payload) {
     /* $('#messages').append('<p> New user joined the room: ' +payload.username+ '</p>'); */
 });
 
-
+/****************************************************************************/
+/** Send an invite message to the server */
 function invite(who) {
     var payload = {};
     payload.requested_user = who;
@@ -147,10 +148,11 @@ socket.on('invite_response', function(payload) {
         alert(payload.message);
         return;
     }
-    var newNode = makeInvitedButton();
+    var newNode = makeInvitedButton(payload.socket_id);
     $('.socket_'+payload.socket_id+' button').replaceWith(newNode);
 });
 
+/** Handle notification that we have been invited */
 socket.on('invited', function(payload) {
     if(payload.result == 'fail') {
         alert(payload.message);
@@ -160,7 +162,38 @@ socket.on('invited', function(payload) {
     $('.socket_'+payload.socket_id+' button').replaceWith(newNode);
 });
 
+/****************************************************************************/
+/** Send an UN-invite message to the server */
+function uninvite(who) {
+    var payload = {};
+    payload.requested_user = who;
 
+    console.log('*** Client Log Message: \'uninvite\' payload: '+JSON.stringify(payload));
+    socket.emit('uninvite', payload);
+}
+
+/** Handle a response after sending an uninvite message to the server */
+socket.on('uninvite_response', function(payload) {
+    if(payload.result == 'fail') {
+        alert(payload.message);
+        return;
+    }
+    var newNode = makeInviteButton(payload.socket_id);
+    $('.socket_'+payload.socket_id+' button').replaceWith(newNode);
+});
+
+/** Handle notification that we have been uninvited */
+socket.on('uninvited', function(payload) {
+    if(payload.result == 'fail') {
+        alert(payload.message);
+        return;
+    }
+    var newNode = makeInviteButton(payload.socket_id);
+    $('.socket_'+payload.socket_id+' button').replaceWith(newNode);
+});
+
+
+/****************************************************************************/
 socket.on('send_message_response', function(payload) {
     if(payload.result == 'fail') {
         alert(payload.message);
@@ -196,9 +229,12 @@ function makeInviteButton(socket_id) {
     return(newNode);
 }
 
-function makeInvitedButton() {
+function makeInvitedButton(socket_id) {
     var newHTML = '<button type=\'button\' class=\'btn btn-primary\'> Invited </button>';
     var newNode = $(newHTML);
+    newNode.click(function() {
+        uninvite(socket_id);
+    });
     return(newNode);
 }
 
