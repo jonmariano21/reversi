@@ -133,20 +133,7 @@ io.sockets.on('connection', function (socket) {
         /* Get the room object */
         var roomObject = io.sockets.adapter.rooms[room];
         
-        /*
-        if(('undefined' === typeof roomObject) || !roomObject){
-            var error_message = 'join_room could\'t create a room (internal error), commmand aborted';
-            log(error_message);
-
-            socket.emit('join_room_response', {
-                result: 'fail',
-                message: error_message
-            });
-
-            return;
-        }
-        */
-
+        
         /* Tell everyone that is already in the room that someone just joined */
         var numClients = roomObject.length;
         var success_data = {
@@ -172,7 +159,9 @@ io.sockets.on('connection', function (socket) {
 
         log('join_room success');
 
-        //log('Room ' + room + ' was just joined by ' + username);
+        if(room !== 'lobby'){
+            send_game_update(socket,room,'initial update');
+        }
 
     });
 
@@ -597,3 +586,68 @@ io.sockets.on('connection', function (socket) {
 
 });
 
+/****************************************************************************/
+/** Code related to the game state */
+
+var games = [];
+
+function create_new_game(){
+    var new_game = {};
+    new_game.player_white = {};
+    new_game.player_black = {};
+    new_game.player_white.socket = '';
+    new_game.player_white.username = '';
+    new_game.player_black.socket = '';
+    new_game.player_black.username = '';
+
+    var d = new Date();
+    new_game.last_move_time = d.getTime();
+
+    new_game.whose_turn = 'white';
+
+    new_game.board = [
+        [' ',' ',' ',' ',' ',' ',' ',' '], 
+        [' ',' ',' ',' ',' ',' ',' ',' '],
+        [' ',' ',' ',' ',' ',' ',' ',' '],
+        [' ',' ',' ','w','b',' ',' ',' '],
+        [' ',' ',' ','b','w',' ',' ',' '],
+        [' ',' ',' ',' ',' ',' ',' ',' '],
+        [' ',' ',' ',' ',' ',' ',' ',' '],
+        [' ',' ',' ',' ',' ',' ',' ',' ']
+    ];
+
+    return new_game;
+
+}
+
+function send_game_update(socket, game_id, message){
+
+    /** Check to see if a game with game_id already exists */
+    if(('undefined' === typeof games[game_id]) || !games[game_id]) {
+        /** No game exists, so make one */
+        console.log('No game exists. Creating '+game_id+' for '+socket.id);
+        games[game_id] = create_new_game();
+    }
+
+
+    /** Make sure that only 2 people are in the game room */
+
+
+    /** Assign this socket a color */
+
+
+    /** Send game update */
+    var success_data = {
+        result: 'succcess',
+        game: games[game_id],
+        message: message,
+        game_id: game_id
+    };
+
+    io.in(game_id).emit('game_update', success_data);
+
+    /** Check to see if the game is over */
+
+
+
+}
