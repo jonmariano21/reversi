@@ -332,7 +332,7 @@ socket.on('game_update', function(payload){
     }
 
     $('#my_color').html('<h3 id="my_color">I am '+my_color+'</h3>');
-    $('#my_color').html('<h4>It is '+payload.game.whose_turn+'\'s turn</h4>');
+    $('#my_color').append('<h4>It is '+payload.game.whose_turn+'\'s turn</h4>');
 
 
     /** Animate changes to the board */
