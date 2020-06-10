@@ -283,7 +283,6 @@ io.sockets.on('connection', function (socket) {
             'result': 'fail',
             'message': failure message
         }
-
         invited:
         {
             'result': 'success',
@@ -391,7 +390,6 @@ io.sockets.on('connection', function (socket) {
             'result': 'fail',
             'message': failure message
         }
-
         UN-invited:
         {
             'result': 'success',
